@@ -1,0 +1,23 @@
+@import forms.SignUpForm.Data
+@import views.html.helper.inputPassword
+@import play.api.mvc.{MessagesRequestHeader, RequestHeader}
+@import play.api.data.Form
+@import views.html.helper.{CSRF, inputText, form}
+
+@(signUpForm: Form[Data])(implicit request: RequestHeader)
+
+@main("Sign Up") {
+    <fieldset class="col-md-6 col-md-offset-3">
+        <legend>Sign Up</legend>
+        @form(action = controllers.routes.SignUpController.submit()) {
+            @CSRF.formField
+            <input type="email" name="email" hiddenLabel="email" placeholder="email" class="form-control input-lg"/>
+            <input type="password" name="password" hiddenLabel="password" placeholder="password" class="form-control input-lg"/>
+            <div class="form-group">
+                <div>
+                    <button id="submit" type="submit" value="submit" class="btn btn-lg btn-primary btn-block">Sign Up</button>
+                </div>
+            </div>
+        }
+    </fieldset>
+}
