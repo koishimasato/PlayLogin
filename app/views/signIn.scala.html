@@ -1,0 +1,24 @@
+@import play.api.data.Form
+@import play.api.mvc.RequestHeader
+@import com.mohiva.play.silhouette.impl.providers.SocialProviderRegistry
+@import forms.SignInForm.Data
+
+@(signInForm: Form[Data])(implicit request: RequestHeader)
+
+@main("Sign In") {
+  <fieldset class="col-md-6 col-md-offset-3">
+    <legend>Sign In</legend>
+    @helper.form(action = controllers.routes.SignInController.submit()) {
+      @helper.CSRF.formField
+      <input type="email" name="email" hiddenLabel="email" placeholder="email" class="form-control input-lg"/>
+      <input type="password" name="password" hiddenLabel="password" placeholder="password" class="form-control input-lg"/>
+      <input type="checkbox" name="rememberMe" text="remember.me" value="true" />
+      <div class="form-group">
+        <div>
+          <button id="submit" type="submit" value="submit" class="btn btn-lg btn-primary btn-block">"sign.in"</button>
+        </div>
+      </div>
+    }
+  </fieldset>
+}
+
