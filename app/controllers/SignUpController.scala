@@ -37,7 +37,7 @@ class SignUpController @Inject()(
       formWithError => Future.successful(BadRequest(views.html.signUp(formWithError))),
 
       data => {
-        val result = Redirect(routes.SignUpController.view()).flashing("info" -> "sign.up.email.sent")
+        val result = Redirect(routes.SignInController.view()).flashing("info" -> "sign.up.email.sent")
 
         val loginInfo = LoginInfo(CredentialsProvider.ID, data.email)
 
