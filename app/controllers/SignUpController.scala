@@ -3,6 +3,7 @@ package controllers
 import java.util.UUID
 
 import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
+import com.mohiva.play.silhouette.api.util.PasswordHasherRegistry
 import com.mohiva.play.silhouette.api.{LoginInfo, Silhouette}
 import com.mohiva.play.silhouette.impl.providers.CredentialsProvider
 import forms.SignUpForm
@@ -18,7 +19,8 @@ class SignUpController @Inject()(
                                   components: ControllerComponents,
                                   silhouette: Silhouette[DefaultEnv],
                                   userService: UserService,
-                                  authInfoRepository: AuthInfoRepository
+                                  authInfoRepository: AuthInfoRepository,
+                                  passwordHasherRegistry: PasswordHasherRegistry,
                                 )
                                 (
                                   implicit ex: ExecutionContext
@@ -35,13 +37,14 @@ class SignUpController @Inject()(
       formWithError => Future.successful(BadRequest(views.html.signUp(formWithError))),
 
       data => {
-        val result = Redirect(routes.SignUpController.view()).flashing("info" -> "sign.up.email.sent")
+        val result = Redirect(routes.SignInController.view()).flashing("info" -> "sign.up.email.sent")
 
         val loginInfo = LoginInfo(CredentialsProvider.ID, data.email)
 
         userService.retrieve(loginInfo).flatMap {
           case Some(user) => Future.successful(result)
           case None =>
+
             val user = User(
               userID = UUID.randomUUID(),
               loginInfo = loginInfo,
@@ -49,8 +52,11 @@ class SignUpController @Inject()(
               activated = true
             )
 
+            val authInfo = passwordHasherRegistry.current.hash(data.password)
+
             for {
-              user <- userService.save(user)
+              _ <- userService.save(user)
+              authInfo <- authInfoRepository.add(loginInfo, authInfo)
             } yield {
               result
             }
